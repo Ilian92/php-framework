@@ -18,11 +18,31 @@ class Router
                 continue;
             }
 
+            if (self::checkHeaders($request, $route) === false) {
+                continue;
+            }
+
             $controller = self::getController($route);
             return $controller->process($request);
         }
 
-        return new Response('Not found', 404);
+        // Ajout de la fonction http_response_code() pour afficher le bon status dans la reponse
+        return new Response('Not found', http_response_code(404));
+    }
+
+    // Ajout de la fonction checkHeaders pour vérifier le format
+    public static function checkHeaders(Request $request, object $route): bool
+    {
+        $headers = $request->getHeaders();
+
+        // Vérifie le Content-Type pour les méthodes POST et PATCH
+        if (in_array($request->getMethod(), ['POST', 'PATCH'])) {
+            if (!isset($headers['Content-Type']) || $headers['Content-Type'] !== 'application/json') {
+                return new Response(json_encode(['error' => 'Unsupported Media Type']), http_response_code(415), ['Content-Type' => 'application/json']);
+            }
+        }
+
+        return true;
     }
 
     private static function getConfig(): array
@@ -36,11 +56,13 @@ class Router
         return in_array($request->getMethod(), $route->methods);
     }
 
+    // modification de la fonction checkUri pour faire marcher les controller prenant en compte un email précis
     private static function checkUri(Request $request, object $route): bool
     {
         $routePath = preg_replace('/:\w+/', '([^/]+)', $route->path);
         $routePath = str_replace('/', '\/', $routePath);
         $pattern = '/^' . $routePath . '$/';
+
         return preg_match($pattern, $request->getUri());
     }
 
