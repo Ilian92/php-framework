@@ -1,6 +1,6 @@
 [
   {
-    "path": "/test",
+    "path": "/test/:filename",
     "methods": ["GET"],
     "controller": "TestController"
   },
@@ -15,17 +15,17 @@
     "controller": "PostContactController"
   },
   {
-    "path": "/contact/:email",
+    "path": "/contact/:filename",
     "methods": ["GET"],
     "controller": "GetContactController"
   },
   {
-    "path": "/contact/:email",
+    "path": "/contact/:filename",
     "methods": ["PATCH"],
     "controller": "PatchContactController"
   },
   {
-    "path": "/contact/:email",
+    "path": "/contact/:filename",
     "methods": ["DELETE"],
     "controller": "DeleteContactController"
   }

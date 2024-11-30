@@ -9,26 +9,29 @@ class DeleteContactController extends AbstractController
 {
     public function process(Request $request): Response
     {
-        return $this->deleteMethod($request->getEmail());
+        // Utilise basename pour obtenir le nom du fichier à partir de l'URI
+        $filename = basename($request->getUri());
+        return $this->deleteMethod($filename);
     }
 
-    public function deleteMethod($email): Response
+    public function deleteMethod($filename): Response
     {
         // Choisit le dossier où chercher le fichier correspondant
         $directory = __DIR__ . '/../../var/contacts/';
-        $pattern = $directory . '*_' . $email . '.json';
-        $files = glob($pattern);
+        if (!str_ends_with($filename, '.json')) {
+            $filename .= '.json';
+        }
+        $filePath = $directory . $filename;
 
-        // Vérification si aucun fichier n'a été trouvé
-        if (!$files) {
-            return new Response(json_encode(['error' => 'Contact not found']), http_response_code(404), ['Content-Type' => 'application/json']);
+        // Vérification si le fichier n'a pas été trouvé
+        if (!$filePath) {
+            return new Response(json_encode(['error' => 'Contact not found']), 404, ['Content-Type' => 'application/json']);
         }
 
-        // Suppression de chaque fichier trouvé
-        foreach ($files as $file) {
-            unlink($file);
-        }
+        // Suppression du fichier trouvé
+        unlink($filePath);
 
-        return new Response('', http_response_code(204), ['Content-Type' => 'application/json']);
+        // Retourne une réponse avec un statut 204 No Content
+        return new Response('', 204, ['Content-Type' => 'application/json']);
     }
 }

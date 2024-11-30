@@ -13,6 +13,8 @@ class TestController extends AbstractController
     {
         $uriParts = explode('/', trim($request->getUri(), '/'));
         $email = end($uriParts);
-        return new Response('Test Controller  ' . $email);
+        $uri = $request->getUri();
+        $filename = basename($request->getUri());
+        return new Response('Test Controller  ' . $filename);
     }
 }

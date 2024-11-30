@@ -10,18 +10,22 @@ class PatchContactController extends AbstractController
 {
     public function process(Request $request): Response
     {
-        return $this->patchMethod($request->getEmail(), $request);
+        // Utilise basename pour obtenir le nom du fichier à partir de l'URI
+        $filename = basename($request->getUri());
+        return $this->patchMethod($filename, $request);
     }
 
-    private function patchMethod($email, $request): Response
+    private function patchMethod($filename, $request): Response
     {
         // Choisit le dossier où chercher le fichier correspondant
         $directory = __DIR__ . '/../../var/contacts/';
-        $pattern = $directory . '*_' . $email . '.json';
-        $files = glob($pattern);
+        if (!str_ends_with($filename, '.json')) {
+            $filename .= '.json';
+        }
+        $filePath = $directory . $filename;
 
         // Vérification si aucun fichier n'a été trouvé
-        if (!$files) {
+        if (!$filePath) {
             return new Response(json_encode(['error' => 'Contact not found']), http_response_code(404), ['Content-Type' => 'application/json']);
         }
 
@@ -36,7 +40,7 @@ class PatchContactController extends AbstractController
         }
 
         // Lecture des données actuelles du fichier
-        $currentData = json_decode(file_get_contents($files[0]), true);
+        $currentData = json_decode(file_get_contents($filePath), true);
         $contact = new Contact(
             $currentData['email'],
             $currentData['subject'],
@@ -78,18 +82,20 @@ class PatchContactController extends AbstractController
             'dateOfLastUpdate' => $contact->getDateOfLastUpdate(),
         ];
 
+        $urlEmail = $request->getEmail();
+
         // Vérification si l'email a été modifié
-        if (isset($body['email']) && $body['email'] !== $email) {
+        if (isset($body['email']) && $body['email'] !== $urlEmail) {
             // Génération du nouveau nom de fichier basé sur le nouveau timestamp et le nouvel email
             $newFilename = sprintf('%s_%s.json', $contact->getDateOfLastUpdate(), $body['email']);
             $newFilePath = $directory . $newFilename;
 
             // Renommage du fichier
-            rename($files[0], $newFilePath);
+            rename($filePath, $newFilePath);
             file_put_contents($newFilePath, json_encode($contactData));
         } else {
             // Écriture des données mises à jour dans le fichier existant
-            file_put_contents($files[0], json_encode($contactData));
+            file_put_contents($filePath, json_encode($contactData));
         }
 
         // Retourne une réponse avec les données mises à jour en format JSON
