@@ -18,10 +18,7 @@ class DeleteContactController extends AbstractController
     {
         // Choisit le dossier où chercher le fichier correspondant
         $directory = __DIR__ . '/../../var/contacts/';
-        if (!str_ends_with($filename, '.json')) {
-            $filename .= '.json';
-        }
-        $filePath = $directory . $filename;
+        $filePath = $directory . $filename . '.json';
 
         // Vérification si le fichier n'a pas été trouvé
         if (!$filePath) {

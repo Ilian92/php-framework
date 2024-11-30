@@ -19,10 +19,7 @@ class PatchContactController extends AbstractController
     {
         // Choisit le dossier où chercher le fichier correspondant
         $directory = __DIR__ . '/../../var/contacts/';
-        if (!str_ends_with($filename, '.json')) {
-            $filename .= '.json';
-        }
-        $filePath = $directory . $filename;
+        $filePath = $directory . $filename . '.json';
 
         // Vérification si aucun fichier n'a été trouvé
         if (!$filePath) {
