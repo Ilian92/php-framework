@@ -1,7 +1,32 @@
 [
-    {
-        "path": "/test",
-        "methods": ["GET"],
-        "controller": "TestController"
-    }
+  {
+    "path": "/test",
+    "methods": ["GET"],
+    "controller": "TestController"
+  },
+  {
+    "path": "/contact",
+    "methods": ["GET"],
+    "controller": "GetAllContactController"
+  },
+  {
+    "path": "/contact",
+    "methods": ["POST"],
+    "controller": "PostContactController"
+  },
+  {
+    "path": "/contact/:email",
+    "methods": ["GET"],
+    "controller": "GetContactController"
+  },
+  {
+    "path": "/contact/:email",
+    "methods": ["PATCH"],
+    "controller": "PatchContactController"
+  },
+  {
+    "path": "/contact/:email",
+    "methods": ["DELETE"],
+    "controller": "DeleteContactController"
+  }
 ]
